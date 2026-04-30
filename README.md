@@ -6,7 +6,7 @@ A scalable **E-Commerce backend system** built using **Spring Boot 3.2.5** and *
 
 ## 🚀 Tech Stack
 
-- **Backend:** Spring Boot 3.2.5  
+- **Backend:** Spring Boot 3.5.14  
 - **Language:** Java 21  
 - **Architecture:** Microservices  
 - **Service Discovery:** Eureka Server  
