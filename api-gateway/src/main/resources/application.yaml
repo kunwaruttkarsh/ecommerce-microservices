@@ -1,0 +1,109 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # ── Service Routes ──────────────────────────────
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/products/**
+
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/payments/**
+
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/ai/**
+
+        # ── Swagger Aggregation Routes ──────────────────
+        - id: user-service-swagger
+          uri: lb://user-service
+          predicates:
+            - Path=/aggregate/user-service/**
+          filters:
+            - RewritePath=/aggregate/user-service/(?<segment>.*), /${segment}
+
+        - id: product-service-swagger
+          uri: lb://product-service
+          predicates:
+            - Path=/aggregate/product-service/**
+          filters:
+            - RewritePath=/aggregate/product-service/(?<segment>.*), /${segment}
+
+        - id: order-service-swagger
+          uri: lb://order-service
+          predicates:
+            - Path=/aggregate/order-service/**
+          filters:
+            - RewritePath=/aggregate/order-service/(?<segment>.*), /${segment}
+
+        - id: payment-service-swagger
+          uri: lb://payment-service
+          predicates:
+            - Path=/aggregate/payment-service/**
+          filters:
+            - RewritePath=/aggregate/payment-service/(?<segment>.*), /${segment}
+
+        - id: ai-service-swagger
+          uri: lb://ai-service
+          predicates:
+            - Path=/aggregate/ai-service/**
+          filters:
+            - RewritePath=/aggregate/ai-service/(?<segment>.*), /${segment}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+
+# Aggregated Swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: User Service
+        url: /aggregate/user-service/api-docs
+      - name: Product Service
+        url: /aggregate/product-service/api-docs
+      - name: Order Service
+        url: /aggregate/order-service/api-docs
+      - name: Payment Service
+        url: /aggregate/payment-service/api-docs
+      - name: AI Service
+        url: /aggregate/ai-service/api-docs
+  api-docs:
+    path: /api-docs
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.ecommerce: DEBUG
